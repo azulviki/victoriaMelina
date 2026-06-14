@@ -1,0 +1,42 @@
+---
+// src/components/Footer.astro
+// Replace href="#" with your actual social URLs
+
+const socials = [
+  { label: 'IG',    href: 'https://instagram.com/TU_USUARIO',  ariaLabel: 'Instagram' },
+  { label: 'Vimeo', href: 'https://vimeo.com/TU_USUARIO',      ariaLabel: 'Vimeo'     },
+  { label: 'LI',    href: 'https://linkedin.com/in/TU_USUARIO',ariaLabel: 'LinkedIn'  },
+];
+
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-white/[0.08] py-8 mt-auto">
+  <div class="w-full max-w-[1200px] mx-auto px-6 flex flex-wrap items-center justify-between gap-4">
+
+    <!-- Name -->
+    <div class="flex flex-col leading-snug">
+      <span class="text-[0.85rem] font-medium text-snow">Victoria Melina</span>
+      <span class="font-mono text-[0.6rem] tracking-[0.12em] text-violet">VJ Bluh</span>
+    </div>
+
+    <!-- Social links -->
+    <div class="flex gap-6">
+      {socials.map(s => (
+        <a
+          href={s.href}
+          aria-label={s.ariaLabel}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="font-mono text-[0.7rem] tracking-[0.1em] text-muted hover:text-snow transition-colors duration-300"
+        >
+          {s.label}
+        </a>
+      ))}
+    </div>
+
+    <!-- Copyright -->
+    <p class="font-mono text-[0.65rem] text-muted">© {year}</p>
+
+  </div>
+</footer>

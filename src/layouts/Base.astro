@@ -1,0 +1,46 @@
+---
+// src/layouts/Base.astro
+// Base HTML layout — wraps every page
+// Props: title, description
+import '@/styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Victoria Melina — VJ Bluh',
+  description = 'Realizadora audiovisual y VJ. After Effects, TouchDesigner, Resolume.',
+} = Astro.props;
+---
+
+<!doctype html>
+<!-- Pasamos lang de forma dinámica si lo necesitas en el futuro, o lo dejamos inicializado -->
+<html lang="es" id="root-html">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+
+    <!-- Favicon placeholder -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    
+    <!-- SCRIPT INLINE DE PRE-CARGA (Opcional pero recomendado para idiomas) -->
+    <script is:inline>
+      // Esto evita que si el usuario tiene configurado 'en' (inglés), 
+      // vea por una fracción de segundo los textos en español antes de que corra el script del Hero.
+      const savedLang = localStorage.getItem('lang') || 'es';
+      document.documentElement.lang = savedLang;
+    </script>
+  </head>
+  <body class="bg-[#080810] text-[#f0f0f8] min-h-screen antialiased selection:bg-[#7b2fff]/30 selection:text-white">
+    <slot />
+  </body>
+</html>
