@@ -9,84 +9,65 @@
   
   <canvas id="heroCanvas" class="absolute inset-0 w-full h-full z-0 cursor-crosshair touch-none"></canvas>
   
-  <div id="hero-text-container" class="absolute inset-0 z-20 px-6 md:px-16 lg:px-24 w-full flex items-center justify-start opacity-0 pointer-events-none select-none">
+  <div id="hero-text-container" class="absolute inset-0 z-20 px-6 md:px-16 lg:px-24 w-full flex items-center justify-start opacity-0 pointer-events-none select-none transition-opacity duration-700 ease-out">
 
     <div class="hero-box relative z-30 flex flex-col gap-0 w-full md:pointer-events-auto">
 
-      <!-- 🔒 BLOQUE SUPERIOR: Inmune a las animaciones de abajo -->
       <div class="hero-top-block w-full md:w-max flex flex-col gap-0">
         <p
           id="hero-eyebrow"
-          class="hero-spread hero-tool-item font-mono uppercase text-blue opacity-0 cursor-default text-[0.8rem] md:text-[0.95rem] tracking-[0.3em] md:tracking-[0.4em] mb-4 w-full"
+          class="hero-spread hero-tool-item font-mono uppercase text-blue cursor-default text-[0.8rem] md:text-[0.95rem] tracking-[0.3em] md:tracking-[0.4em] mb-4 w-full"
           data-es="Realizadora audiovisual & VJ"
           data-en="Audiovisual Director & VJ"
         >Realizadora audiovisual & VJ</p>
 
-        <!-- H1: Mide exactamente lo mismo tanto en mobile como en desktop -->
-        <!-- H1: El contenedor bloquea eventos, solo los span internos con texto los reciben si es necesario -->
-<h1
-  id="hero-name"
-  class="hero-title relative z-40 opacity-0 block mb-2 w-full pointer-events-none"
-  style="font-family: 'Montserrat', sans-serif; font-weight: 200; font-size: clamp(2.2rem, 9vw, 6.5rem); line-height: 0.95;"
->
-  <!-- 📱 VISTA MOBILE -->
-  <span class="row-name-mobile block md:hidden mb-1 pointer-events-none">
-    <span>V</span><span>I</span><span>C</span><span>T</span><span>O</span><span>R</span><span>I</span><span>A</span>
-  </span>
-  <span class="row-name-mobile block md:hidden pointer-events-none">
-    <span>M</span><span>E</span><span>L</span><span>I</span><span>N</span><span>A</span>
-  </span>
+        <h1
+          id="hero-name"
+          class="hero-title relative z-40 cursor-pointer block mb-2 w-full pointer-events-none"
+          style="font-family: 'Montserrat', sans-serif; font-weight: 200; font-size: clamp(2.2rem, 9vw, 6.5rem); line-height: 0.95;"
+        >
+          <span class="row-name-mobile block md:hidden mb-1 pointer-events-none">
+            <span>V</span><span>I</span><span>C</span><span>T</span><span>O</span><span>R</span><span>I</span><span>A</span>
+          </span>
+          <span class="row-name-mobile block md:hidden pointer-events-none">
+            <span>M</span><span>E</span><span>L</span><span>I</span><span>N</span><span>A</span>
+          </span>
 
-  <!-- 🖥️ VISTA DESKTOP: Añadimos cursor-pointer solo si querés interactuar con el nombre, sino dejalos en pointer-events-none -->
-  <span class="hidden md:flex w-full justify-between pointer-events-none">
-    <span class="pointer-events-auto cursor-pointer">V</span>
-    <span class="pointer-events-auto cursor-pointer">I</span>
-    <span class="pointer-events-auto cursor-pointer">C</span>
-    <span class="pointer-events-auto cursor-pointer">T</span>
-    <span class="pointer-events-auto cursor-pointer">O</span>
-    <span class="pointer-events-auto cursor-pointer">R</span>
-    <span class="pointer-events-auto cursor-pointer">I</span>
-    <span class="pointer-events-auto cursor-pointer">A</span>
-  </span>
-  <span class="hidden md:flex w-full justify-between pointer-events-none mt-1">
-    <span class="pointer-events-auto cursor-pointer">M</span>
-    <span class="pointer-events-auto cursor-pointer">E</span>
-    <span class="pointer-events-auto cursor-pointer">L</span>
-    <span class="pointer-events-auto cursor-pointer">I</span>
-    <span class="pointer-events-auto cursor-pointer">N</span>
-    <span class="pointer-events-auto cursor-pointer">A</span>
-  </span>
-</h1>
+          <span class="hidden md:flex w-full justify-between pointer-events-none">
+            <span>V</span><span>I</span><span>C</span><span>T</span><span>O</span><span>R</span><span>I</span><span>A</span>
+          </span>
+          <span class="hidden md:flex w-full justify-between pointer-events-none mt-1">
+            <span>M</span><span>E</span><span>L</span><span>I</span><span>N</span><span>A</span>
+          </span>
+        </h1>
 
         <p
           id="hero-alias"
-          class="hero-spread font-mono tracking-[0.25em] text-violet/60 opacity-0 cursor-default text-[1.2rem] md:text-[1.5rem] mt-2 mb-4 md:mb-6 w-full"
+          class="hero-spread font-mono tracking-[0.25em] text-violet/60 cursor-default text-[1.2rem] md:text-[1.5rem] mt-2 mb-4 md:mb-6 w-full"
         >VJ BLUH</p>
       </div>
 
-      <!-- 🌊 BLOQUE INFERIOR: El tagline se expande y afecta SOLO a las tools de abajo -->
       <div class="hero-bottom-block w-full flex flex-col gap-0">
         <p
           id="hero-tagline"
-          class="hero-tool-item hero-spread font-mono uppercase opacity-0 cursor-default text-[0.95rem] md:text-[1.2rem] mb-6 w-full"
+          class="hero-tool-item hero-spread font-mono uppercase cursor-default text-[0.95rem] md:text-[1.2rem] mb-6 w-full"
           data-es="Creo imágenes que se mueven en tiempo real."
           data-en="I make images that move in real time."
         >Creo imágenes que se mueven en tiempo real.</p>
 
-        <!-- Tools: Se desplazan o adaptan según el comportamiento del tagline superior -->
         <div
           id="hero-tools"
-          class="flex flex-col gap-3 md:flex-row md:justify-between md:gap-4 w-full font-mono uppercase text-muted opacity-0 text-[0.85rem] md:text-[0.95rem] tracking-[0.1em] mb-8 relative z-40">
-          <span class="hero-tool-item cursor-pointer pointer-events-auto">After Effects</span>
-          <span class="hero-tool-item cursor-pointer pointer-events-auto">TouchDesigner</span>
-          <span class="hero-tool-item cursor-pointer pointer-events-auto">Resolume</span>
+          class="flex flex-col gap-3 md:flex-row md:justify-between md:gap-4 w-full font-mono uppercase text-muted text-[0.85rem] md:text-[0.95rem] tracking-[0.1em] mb-8 relative z-40">
+          <span class="hero-tool-item cursor-pointer">After Effects</span>
+          <span class="hero-tool-item cursor-pointer">TouchDesigner</span>
+          <span class="hero-tool-item cursor-pointer">Resolume</span>
         </div>
       </div>
 
     </div>
   </div>
 
-  <div id="hero-scroll" class="absolute bottom-8 left-6 md:left-16 lg:left-24 z-30 opacity-0 pointer-events-none flex items-center gap-3">
+  <div id="hero-scroll" class="absolute bottom-8 left-6 md:left-16 lg:left-24 z-30 opacity-100 pointer-events-auto cursor-pointer flex items-center gap-3 select-none">
     <div class="w-12 h-px overflow-hidden">
       <div id="scrollLine" class="w-full h-full bg-gradient-to-r from-transparent to-violet origin-left"></div>
     </div>
@@ -318,15 +299,16 @@
       { scaleX: 1, duration: 1, ease: 'power1.inOut', repeat: -1, yoyo: true, delay: 1.5 }
     );
   } else {
-    // ★ MOBILE: el texto empieza invisible, solo partículas
-    // El contenedor de texto queda oculto; los hijos no necesitan opacity propia
+    // ★ MOBILE: El contenedor de texto empieza invisible y sin eventos
     gsap.set('#hero-text-container', { opacity: 0, pointerEvents: 'none' });
-    gsap.set(['#hero-eyebrow', '#hero-name', '#hero-alias', '#hero-tagline', '#hero-tools'], { opacity: 1, y: 0 });
+    
+    // Dejamos los hijos listos con opacidad 0 para controlarlos individualmente en la revelación
+    gsap.set(['#hero-eyebrow', '#hero-name', '#hero-alias', '#hero-tagline', '#hero-tools'], { opacity: 0 });
 
-    // ★ Indicador de scroll: aparece rápido para invitar a tocarlo
+    // ★ El indicador de scroll aparece de inmediato en el aterrizaje
     gsap.fromTo('#hero-scroll',
       { opacity: 0 },
-      { opacity: 1, duration: 0.6, delay: 0.8 }
+      { opacity: 1, duration: 0.6, delay: 0.4 }
     );
     gsap.set('#hero-scroll', { pointerEvents: 'auto' });
 
@@ -335,7 +317,7 @@
       { scaleX: 1, duration: 1, ease: 'power1.inOut', repeat: -1, yoyo: true }
     );
 
-    // ★ Al tocar el indicador de scroll → reveal del texto y bloqueo del canvas
+
     let heroRevealed = false;
     const heroScrollBtn = document.getElementById('hero-scroll')!;
 
@@ -343,84 +325,73 @@
       if (heroRevealed) return;
       heroRevealed = true;
 
-      // Desactiva interacción con partículas
+      // Desactivamos la interacción drag/hover de partículas para que no interfiera con los links de texto
       canvasInteractionEnabled = false;
       canvas.style.pointerEvents = 'none';
 
-      // Oculta el botón de scroll
-      gsap.to('#hero-scroll', { opacity: 0, duration: 0.3 });//
-
-      // Revela el texto subiendo desde abajo
+      // El botón de scroll NO se oculta. Permanece visible y con interacción nativa.
       gsap.set('#hero-text-container', { opacity: 1, pointerEvents: 'auto' });
+      
+      // Animación escalonada para que aparezca el contenido estéticamente
       const tl = gsap.timeline();
-      tl.fromTo('#hero-eyebrow',
-          { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out' })
-        .fromTo('#hero-name',
-          { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.1')
-        .fromTo('#hero-alias',
-          { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, '-=0.3')
-        .fromTo('#hero-tagline',
-          { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, '-=0.2')
-        .fromTo('#hero-tools',
-          { opacity: 0 },        { opacity: 1, duration: 0.4, ease: 'power1.out' },        '-=0.1');
+      tl.fromTo('#hero-eyebrow',  { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' })
+        .fromTo('#hero-name',     { opacity: 0, y: 25 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, '-=0.15')
+        .fromTo('#hero-alias',    { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, '-=0.25')
+        .fromTo('#hero-tagline',  { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, '-=0.2')
+        .fromTo('#hero-tools',    { opacity: 0 },         { opacity: 1, duration: 0.4, ease: 'power1.out' },       '-=0.15');
     }
 
-    // ★ Se dispara al pasar el dedo por encima (touchmove sobre el documento)
-document.addEventListener('touchmove', (e) => {
-  if (heroRevealed) return;
-  const touch = e.touches[0];
-  const rect = heroScrollBtn.getBoundingClientRect();
-  // Área de hit generosa: 48px extra arriba/abajo para facilitar el gesto
-  if (
-    touch.clientX >= rect.left - 24 &&
-    touch.clientX <= rect.right + 24 &&
-    touch.clientY >= rect.top - 48 &&
-    touch.clientY <= rect.bottom + 48
-  ) {
-    revealHeroMobile();
-  }
-}, { passive: true });
+    // ★ Listener de Touchmove optimizado para el área del botón (Hitbox de disparo)
+    document.addEventListener('touchmove', (e) => {
+      if (heroRevealed) return;
+      const touch = e.touches[0];
+      const rect = heroScrollBtn.getBoundingClientRect();
+      
+      // Hitbox extendida para que sea fácil activarlo con un swipe intuitivo en la zona
+      if (
+        touch.clientX >= rect.left - 40 &&
+        touch.clientX <= rect.right + 40 &&
+        touch.clientY >= rect.top - 60 &&
+        touch.clientY <= rect.bottom + 60
+      ) {
+        revealHeroMobile();
+      }
+    }, { passive: true });
 
-// Fallback click para simuladores
-heroScrollBtn.addEventListener('click', revealHeroMobile);
+    // Clic / Tap directo en el botón
+    heroScrollBtn.addEventListener('click', (e) => {
+      if (!heroRevealed) {
+        e.preventDefault();
+        revealHeroMobile();
+      } else {
+        // Si YA está revelado, el botón adquiere la función de saltar a la siguiente sección
+        const nextSection = document.querySelector('section:not(#hero-section)');
+        if (nextSection) {
+          nextSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    });
   }
 
   // ─── SCROLLTRIGGER MATCHMEDIA ─────────────────────────────────────────────
   ScrollTrigger.matchMedia({
-    // ★ MOBILE: ya no maneja la aparición del texto (eso lo hace el tap),
-    //   solo se ocupa de hacer fade-out del hero cuando el usuario sigue scrolleando
+    // ★ MOBILE: Controla el desvanecimiento total cuando ya se puede trackear el scroll hacia abajo
     "(max-width: 767px)": function() {
       ScrollTrigger.create({
         trigger: '#hero-section',
         start: 'top top',
-        end: '+=60%',
+        end: '+=80%', 
         scrub: true,
         onUpdate(self) {
-          // Fade out del hero completo al hacer scroll hacia abajo
           const opacity = 1 - self.progress;
-          gsap.set(['#hero-text-container', '#heroCanvas'], { opacity });
+          gsap.set(['#hero-text-container', '#heroCanvas', '#hero-scroll'], { opacity });
         }
       });
     },
 
-    // DESKTOP: sin cambios
+    // DESKTOP: Inmune
     "(min-width: 768px)": function() {
       gsap.set('#hero-text-container', { opacity: 1 });
       gsap.set('#hero-scroll', { opacity: 1 });
     }
   });
- 
-  // ─── LANG SYNC ────────────────────────────────────────────────────────────
-  function applyLangToHero(lang: 'es' | 'en') {
-    document.querySelectorAll<HTMLElement>('#hero-eyebrow, #hero-tagline, #hero-scroll span').forEach(el => {
-      const val = el.dataset[lang];
-      if (val) el.textContent = val;
-    });
-  }
-  const saved = (localStorage.getItem('lang') as 'es' | 'en' | null) ?? 'es';
-  applyLangToHero(saved);
-  window.addEventListener('langchange', (e: Event) => {
-    const { lang } = (e as CustomEvent<{ lang: 'es' | 'en' }>).detail;
-    applyLangToHero(lang);
-  });
-</script>
