@@ -12,8 +12,10 @@
     --border: rgba(255,255,255,0.08);
     
     /* 🌟 VARIABLES DE COLOR: Las centralizamos aquí para usarlas en todo el CSS */
-    --color-brand-dark: #4c1d95;  /* El violeta oscuro base de tu nombre */
+    --color-brand-dark: #56088a;  /* El violeta oscuro base de tu nombre */
     --color-brand-light: #c4b5fd; /* El lavanda del hover */
+    --color-snow: #4e4e5f;    /* El blanco nieve para textos */
+    --color-bg: #080810;      /* El fondo oscuro */
   }
 
   html {
@@ -87,13 +89,26 @@
 .hero-spread {
   display: block;
   transition: letter-spacing 0.35s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s ease;
+ 
 }
 
 .hero-spread:hover {
-  letter-spacing: 0.15em;
+  letter-spacing: 0.20em;
   color: var(--color-brand-light); /* 🌟 Usamos tu variable nativa */
 }
 
+#hero-eyebrow.hero-spread:hover {
+  letter-spacing: 0.60em;
+}
+
+#hero-eyebrow {
+  color: var(--blue);
+}
+
+#hero-eyebrow:hover {
+  color: var(--blue);
+  transform: translateY(-4px);
+}
 /* Botones con bordes animados */
 .btn-hero {
   position: relative;

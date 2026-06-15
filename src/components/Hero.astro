@@ -8,8 +8,8 @@
   <!-- CAPA 0: El canvas al fondo de todo -->
   <canvas id="heroCanvas" class="absolute inset-0 w-full h-full z-0 cursor-crosshair"></canvas>
   
-  <!-- CAPA 1: El degradado encima del canvas pero DEBAJO del texto. Le quitamos el z-[1] y lo dejamos con z-0 o z-10 controlado -->
-  <div class="absolute inset-0 z-1 bg-[radial-gradient(ellipse_at_65%_50%,transparent_20%,#080810_78%)] pointer-events-none"></div>
+  <!-- CAPA 1: El degradado encima del canvas pero DEBAJO del texto. Le quitamos el z-[1] y lo dejamos con z-0 o z-10 controlado
+  <div class="absolute inset-0 z-1 bg-[radial-gradient(ellipse_at_65%_50%,transparent_20%,#080810_78%)] pointer-events-none"></div>-->
 
   <!-- CAPA 2: El contenedor de texto con un z-index superior (z-20) para obligarlo a estar al frente -->
   <div class="relative z-20 px-8 md:px-16 lg:px-24 w-full max-w-4xl pointer-events-none">
@@ -20,7 +20,7 @@
       <!-- Eyebrow — en caja -->
       <p
         id="hero-eyebrow"
-        class="hero-spread font-mono uppercase text-blue opacity-0 cursor-default
+        class="hero-spread hero-tool-item font-mono uppercase text-blue opacity-0 cursor-default
                text-[0.95rem] tracking-[0.4em] mb-4 w-full"
         data-es="Realizadora audiovisual & VJ"
         data-en="Audiovisual Director & VJ"
@@ -30,8 +30,7 @@
       <h1
         id="hero-name"
         class="hero-title relative z-40 opacity-0 cursor-pointer block mb-2"
-        style="font-family: 'Open Sans', sans-serif; font-weight: 700; font-size: clamp(3.5rem, 8vw, 6.5rem); line-height: 0.85;"
-      >
+        style="font-family: 'Open Sans', sans-serif; font-weight: 700; font-size: clamp(3.5rem, 8vw, 6.5rem); line-height: 0.85;">
         <span class="block pointer-events-auto">Victoria</span>
         <span class="block pointer-events-auto">Melina</span>
       </h1>
@@ -45,8 +44,8 @@
 
       <!-- Tagline -->
       <p
-        id="hero-tagline"
-        class="hero-spread text-snow/70 font-light opacity-0 cursor-default
+  id="hero-tagline"
+        class="hero-tool-item hero-spread font-mono uppercase opacity-0 cursor-default
                text-[1.2rem] mb-6 w-full"
         data-es="Creo imágenes que se mueven en tiempo real."
         data-en="I make images that move in real time."
@@ -57,18 +56,13 @@
       <div
         id="hero-tools"
         class="flex flex-col md:flex-row md:justify-between gap-3 md:gap-4 w-full font-mono uppercase text-muted opacity-0
-               text-[0.95rem] tracking-[0.1em] mb-8 relative z-40 pointer-events-auto"
-      >
+               text-[0.95rem] tracking-[0.1em] mb-8 relative z-40 pointer-events-auto">
         <span class="hero-tool-item cursor-pointer pointer-events-auto">After Effects</span>
         <span class="hero-tool-item cursor-pointer pointer-events-auto">TouchDesigner</span>
         <span class="hero-tool-item cursor-pointer pointer-events-auto">Resolume</span>
       </div>
 
-      <!-- Buttons -->
-      <div id="hero-cta" class="flex gap-4 w-full opacity-0 relative z-40 pointer-events-auto">
-        <a href="#work"    class="btn-hero flex-1 text-center justify-center" data-es="Ver trabajos" data-en="See work">Ver trabajos</a>
-        <a href="#contact" class="btn-hero flex-1 text-center justify-center" data-es="Contacto"     data-en="Get in touch">Contacto</a>
-      </div>
+      
 
     </div>
   </div>
@@ -172,10 +166,8 @@
 
   function drawFrame() {
     ctx.clearRect(0, 0, W, H);
-    const grd = ctx.createRadialGradient(W*0.65, H*0.5, 0, W*0.65, H*0.5, W*0.65);
-    grd.addColorStop(0, 'rgba(60,10,120,0.18)');
-    grd.addColorStop(1, 'rgba(8,8,16,0)');
-    ctx.fillStyle = grd; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = 'rgba(8,8,16,0.15)';
+    ctx.fillRect(0, 0, W, H);
 
     for (let i = particles.length - 1; i >= 0; i--) {
       const p = particles[i];
@@ -228,7 +220,7 @@
       .fromTo('#hero-alias',    { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.5, ease: 'power2.out' }, '-=0.4')
       .fromTo('#hero-tagline',  { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.5, ease: 'power2.out' }, '-=0.2')
       .fromTo('#hero-tools',    { opacity: 0 },          { opacity: 1, duration: 0.5, ease: 'power1.out' },       '-=0.1')
-      .fromTo('#hero-cta',      { opacity: 0, y: 10 },  { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, '-=0.2')
+      //.fromTo('#hero-cta',      { opacity: 0, y: 10 },  { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, '-=0.2')
       .fromTo('#hero-scroll',   { opacity: 0 },          { opacity: 1, duration: 0.4 },                           '-=0.1');
 
     gsap.fromTo('#scrollLine',
