@@ -62,15 +62,19 @@
 /* ==========================================================================
    HERO COMPONENT STYLES (Victoria Melina Portfolio)
    ========================================================================== */
-   @media (max-width: 767px) {
-  html, body {
-    /* Previene comportamientos extraños de rebote elástico en iOS/Android mientras está bloqueado */
-    overscroll-behavior-y: contain; 
+  /* Corrector de inercia y freno de mano absoluto para mobile */
+@media (max-width: 767px) {
+  html.lock-scroll,
+  body.lock-scroll {
+    overflow: hidden !important;
+    height: 100dvh !important;
+    position: fixed !important; /* Clava el viewport en iOS para matar el momentum */
+    width: 100%;
   }
-  
+
   #hero-section {
-    /* Asegura que el hero ocupe exactamente la pantalla disponible */
-    height: 100dvh; 
+    height: 100dvh;
+    width: 100%;
   }
 }
 

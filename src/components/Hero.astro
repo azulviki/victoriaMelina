@@ -305,10 +305,14 @@
       { scaleX: 1, duration: 1, ease: 'power1.inOut', repeat: -1, yoyo: true, delay: 1.5 }
     );
 
- } else {
+} else {
     // 1️⃣ CONFIGURACIÓN INICIAL EN MOBILE
     gsap.set('#hero-text-container', { opacity: 0, pointerEvents: 'none' });
     gsap.set(['#hero-eyebrow', '#hero-name', '#hero-alias', '#hero-tagline', '#hero-tools'], { opacity: 0 });
+
+    // Forzamos el bloqueo absoluto por CSS en el render inicial de mobile
+    document.documentElement.classList.add('lock-scroll');
+    document.body.classList.add('lock-scroll');
 
     // Animación infinita para la línea de scroll
     gsap.fromTo('#scrollLine',
@@ -318,21 +322,15 @@
 
     let heroRevealed = false;
     let textAnimationDone = false;
+    let fingerIsDown = false;
     const scrollZone = document.getElementById('hero-scroll-zone')!;
 
-    // 2️⃣ BLOQUEO ESTRICTO POR DEFECTO
-    // Bloqueamos por completo el movimiento nativo en todo el viewport al aterrizar
-    function blockMobileScroll(e: TouchEvent) {
-      e.preventDefault();
-    }
-    window.addEventListener('touchmove', blockMobileScroll, { passive: false });
-
-    // 3️⃣ FUNCIÓN DE REVELACIÓN (Se ejecuta de forma controlada)
+    // 2️⃣ FUNCIÓN DE REVELACIÓN DEL TEXTO
     function revealHeroMobile() {
       if (heroRevealed) return;
       heroRevealed = true;
 
-      // Apagamos la interacción del canvas para no molestar a los links del texto
+      // Apagamos la interacción del canvas para liberar los links del texto
       canvasInteractionEnabled = false;
       canvas.style.pointerEvents = 'none';
 
@@ -341,8 +339,12 @@
       
       const tl = gsap.timeline({
         onComplete: () => {
-          // La animación terminó, pero el scroll SIGUE bloqueado por el 'touchmove' global.
           textAnimationDone = true;
+          // Si la animación termina pero el usuario sigue teniendo el dedo apoyado,
+          // esperamos a que lo levante para liberar la pantalla.
+          if (!fingerIsDown) {
+            liberarScrollNativo();
+          }
         }
       });
 
@@ -353,27 +355,33 @@
         .fromTo('#hero-tools',    { opacity: 0 },         { opacity: 1, duration: 0.4, ease: 'power1.out' },       '-=0.15');
     }
 
-    // 4️⃣ CAPTURA DEL GESTO DE SCROLL EN LA ZONA INFERIOR
-    // Cuando el usuario desliza el dedo en la franja, disparamos la animación pero la pantalla NO se mueve
+    function liberarScrollNativo() {
+      // 🎯 Eliminamos las clases de CSS: la página recupera su altura total
+      // y el usuario ahora sí puede realizar un SEGUNDO scroll independiente para bajar.
+      document.documentElement.classList.remove('lock-scroll');
+      document.body.classList.remove('lock-scroll');
+    }
+
+    // 3️⃣ DETECCIÓN DE ESTADOS DEL DEDO (FILTRO DE INERCIA)
+    scrollZone.addEventListener('touchstart', () => {
+      fingerIsDown = true;
+    }, { passive: true });
+
     scrollZone.addEventListener('touchmove', (e) => {
       if (!heroRevealed) {
-        e.stopPropagation(); 
         revealHeroMobile();
       }
     }, { passive: true });
 
-    // 🎯 LA CLAVE DEL SEGUNDO PASO: El evento 'touchend'
-    // Escuchamos el momento exacto en que el usuario levanta el dedo de la pantalla
     window.addEventListener('touchend', () => {
-      // Solo si el texto ya se reveló por completo y el usuario levantó el dedo...
+      fingerIsDown = false;
+      // Solo liberamos el freno de mano si la animación del texto ya terminó por completo
       if (heroRevealed && textAnimationDone) {
-        // ...destruimos el bloqueo global de scroll. 
-        // El viewport queda libre, obligando al usuario a realizar un NUEVO scroll físico para bajar.
-        window.removeEventListener('touchmove', blockMobileScroll);
+        liberarScrollNativo();
       }
     });
 
-    // Mantener el comportamiento del tap por si hacen click directo en la franja
+    // Mantener compatibilidad con un tap rápido en la franja
     scrollZone.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -387,6 +395,7 @@
         }
       }
     });
+  
   
   
 
