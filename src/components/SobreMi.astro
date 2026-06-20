@@ -45,7 +45,7 @@
             muted
             loop
             playsinline
-            preload="metadata"
+            preload="auto"
             poster="/images/sobremi-poster.jpg"
           >
             <source src="/src/content/hiro.mp4" type="video/mp4" />
@@ -136,6 +136,23 @@
     targets.forEach(el => observer.observe(el));
   }
 
+// ─── FIX AUTOPLAY EN MOBILE (Safari/iOS) ─────────────────────────────────
+  const sobremiVideo = document.querySelector('#sobremi-section .sobremi-video') as HTMLVideoElement | null;
+
+  if (sobremiVideo) {
+    const videoObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            sobremiVideo.play().catch(() => {});
+          }
+        });
+      },
+      { threshold: 0.25 }
+    );
+    videoObserver.observe(sobremiVideo);
+  }
+  
   // ─── PARTÍCULAS AMBIENTALES DE FONDO ─────────────────────────────────────
   // Versión liviana y sin interacción del canvas del Hero: solo atmósfera,
   // con opacidad baja para no competir con el texto ni el video.
