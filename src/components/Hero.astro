@@ -360,9 +360,10 @@
     }
 
     function liberarScrollNativo() {
-      document.documentElement.remove('lock-scroll');
-      document.body.classList.remove('lock-scroll');
-    }
+  // Así se remueven las clases de forma segura sin romper el DOM
+  document.documentElement.classList.remove('lock-scroll');
+  document.body.classList.remove('lock-scroll');
+}
 
     // El reveal se ejecuta ÚNICAMENTE al interactuar en la scrollZone
     scrollZone.addEventListener('touchstart', () => { fingerIsDown = true; }, { passive: true });
