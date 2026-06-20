@@ -138,7 +138,11 @@
    ELEMENTOS INTERACTIVOS (PROFESIONES RECONFIGURADAS)
    ========================================================================== */
 
+
+
 /* Elementos de profesión (Reposo) */
+
+
 .hero-tool-item {
   display: inline-block;
   
@@ -164,6 +168,14 @@
   transform: translateY(-6px); 
 }
 
+/* Sobre mí / Contacto: mismo color de reposo y hover que el H1 */
+.hero-nav-link {
+  color: var(--color-brand-dark) !important;
+}
+
+.hero-nav-link:hover {
+  color: var(--color-brand-light) !important;
+}
 
 /* ==========================================================================
    ANIMACIÓN DE ENTRADA Y CONTENEDOR (ALINEACIÓN INMUTABLE MOBILE)

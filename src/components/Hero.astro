@@ -74,6 +74,15 @@
           <span class="hero-tag-item cursor-pointer" data-tag-tool="resolume">[ Resolume Arena ]</span>
           <span class="hero-tag-item cursor-pointer" data-tag-tool="ableton">[ Ableton Live ]</span>
         </div>
+
+        <div
+          id="hero-nav-links"
+          class="hero-title flex flex-row justify-between w-full uppercase tracking-[0.1em] relative z-40 pointer-events-auto"
+          style="font-family: 'Montserrat', sans-serif; font-weight: 200;">
+          <span class="hero-tool-item hero-nav-link cursor-pointer block text-left" data-scroll-target="sobremi-section">Sobre mí</span>
+          <span class="hero-tool-item hero-nav-link cursor-pointer block text-right" data-scroll-target="contacto-section">Contacto</span>
+        </div>
+
       </div>
     </div>
   </div>
@@ -320,12 +329,13 @@
       .fromTo('#hero-name',     { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.9, ease: 'power3.out' }, '-=0.1')
       .fromTo('#hero-alias',    { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.5, ease: 'power2.out' }, '-=0.4')
       .fromTo('#hero-tagline',  { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.5, ease: 'power2.out' }, '-=0.2')
-      .fromTo('#hero-tools',    { opacity: 0 },          { opacity: 1, duration: 0.5, ease: 'power1.out' },       '-=0.1');
+      .fromTo('#hero-tools',    { opacity: 0 },          { opacity: 1, duration: 0.5, ease: 'power1.out' },       '-=0.1')
+      .fromTo('#hero-nav-links',{ opacity: 0 },          { opacity: 1, duration: 0.5, ease: 'power1.out' },       '-=0.2');
  
   } else {
     // ─── MOBILE: ESTADO INICIAL ──────────────────────────────────────────
     gsap.set('#hero-text-container', { opacity: 0, pointerEvents: 'none' });
-    gsap.set(['#hero-eyebrow', '#hero-name', '#hero-alias', '#hero-tagline', '#hero-tools'], { opacity: 0 });
+    gsap.set(['#hero-eyebrow', '#hero-name', '#hero-alias', '#hero-tagline', '#hero-tools', '#hero-nav-links'], { opacity: 0 });
 
     document.documentElement.classList.add('lock-scroll');
     document.body.classList.add('lock-scroll');
@@ -374,7 +384,8 @@
         .fromTo('#hero-name',     { opacity: 0, y: 25 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, '-=0.15')
         .fromTo('#hero-alias',    { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, '-=0.25')
         .fromTo('#hero-tagline',  { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, '-=0.2')
-        .fromTo('#hero-tools',    { opacity: 0 },          { opacity: 1, duration: 0.4, ease: 'power1.out' },       '-=0.15');
+        .fromTo('#hero-tools',    { opacity: 0 },          { opacity: 1, duration: 0.4, ease: 'power1.out' },       '-=0.15')
+        .fromTo('#hero-nav-links',{ opacity: 0 },          { opacity: 1, duration: 0.4, ease: 'power1.out' },       '-=0.1');
     }
 
     function liberarScrollNativo() {
@@ -441,11 +452,21 @@
     });
   });
 
-  document.querySelectorAll('[data-tag-tool]').forEach(el => {
+document.querySelectorAll('[data-tag-tool]').forEach(el => {
     el.addEventListener('click', () => {
       window.dispatchEvent(new CustomEvent('worksFilter', {
         detail: { tool: el.getAttribute('data-tag-tool') }
       }));
     });
   });
+
+  // ─── LINKS DE NAVEGACIÓN: SOBRE MÍ / CONTACTO (scroll suave) ─────────────
+  document.querySelectorAll('[data-scroll-target]').forEach(el => {
+    el.addEventListener('click', () => {
+      const targetId = el.getAttribute('data-scroll-target');
+      const target = document.getElementById(targetId!);
+      target?.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
 </script>
