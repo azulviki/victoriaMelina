@@ -98,31 +98,11 @@
 
 
 <script>
-  // Click en professions → filtra Works por categoría
-  document.querySelectorAll('[data-link-category]').forEach(el => {
-    el.addEventListener('click', () => {
-      window.dispatchEvent(new CustomEvent('worksFilter', {
-        detail: { tool: el.getAttribute('data-link-category') }
-      }));
-    });
-  });
-
-  // Click en tags → filtra Works por tool
-  document.querySelectorAll('[data-tag-tool]').forEach(el => {
-    el.addEventListener('click', () => {
-      window.dispatchEvent(new CustomEvent('worksFilter', {
-        detail: { tool: el.getAttribute('data-tag-tool') }
-      }));
-    });
-  });
-</script>
-
-<script>
   import { gsap } from 'gsap';
   import { ScrollTrigger } from 'gsap/ScrollTrigger';
   gsap.registerPlugin(ScrollTrigger);
  
-  // ─── CANVAS ───────────────────────────────────────────────────────────────
+  // ─── 1. DECLARACIÓN ÚNICA DEL CANVAS Y VARIABLES ─────────────────────────
   const canvas = document.getElementById('heroCanvas') as HTMLCanvasElement;
   const ctx = canvas.getContext('2d')!;
   let W = 0, H = 0;
@@ -137,16 +117,17 @@
   }
  
   let particles: Particle[] = [];
-  function rand(a: number, b: number) { return a + Math.random() * (b - a); }
+  const rand = (a: number, b: number) => a + Math.random() * (b - a);
  
   function makeParticle(): Particle {
     const angle = Math.random() * Math.PI * 2;
     const speed = rand(0.08, 0.45);
-    const hue   = Math.random() < 0.6 ? 270 : 190;
+    const hue = Math.random() < 0.6 ? 270 : 190;
     return {
       x: Math.random() * W, y: Math.random() * H,
       vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
-      size: rand(5, 12), alpha: rand(0.25, 0.85),
+      size: rand(4, 10), // Ajuste sutil de tamaño máximo para rendimiento móvil
+      alpha: rand(0.25, 0.85),
       hue, sat: rand(70, 100), lit: rand(50, 75),
       life: 0, maxLife: rand(200, 700),
     };
@@ -155,47 +136,55 @@
   function makeBurstParticle(x: number, y: number): Particle {
     const angle = Math.random() * Math.PI * 2;
     const speed = rand(1.5, 5);
-    const hue   = Math.random() < 0.5 ? 270 : 190;
+    const hue = Math.random() < 0.5 ? 270 : 190;
     return {
       x, y,
       vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
-      size: rand(6, 14), alpha: rand(0.7, 1),
+      size: rand(5, 12),
+      alpha: rand(0.7, 1),
       hue, sat: 100, lit: rand(65, 85),
       life: 0, maxLife: rand(40, 90), drag: 0.92,
     };
   }
  
-  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  function resize() { 
+    W = canvas.width = window.innerWidth; 
+    H = canvas.height = window.innerHeight; 
+  }
+  
   function initParticles() {
-    const count = Math.min(Math.floor((W * H) / 6000), 180);
+    // Reducimos la densidad de partículas SOLO en mobile para evitar lag de procesamiento
+    const isMobile = window.innerWidth < 768;
+    const divisor = isMobile ? 9500 : 6000;
+    const maxCount = isMobile ? 85 : 180;
+    const count = Math.min(Math.floor((W * H) / divisor), maxCount);
     particles = Array.from({ length: count }, makeParticle);
   }
  
-  const REPEL_RADIUS = 140, REPEL_FORCE = 8, BURST_COUNT = 18;
+  const REPEL_RADIUS = 140, REPEL_FORCE = 8, BURST_COUNT = 15; // Bajado de 18 a 15 para mobile
   const HOVER_RADIUS = 80,  HOVER_FORCE = 0.4;
   const ATTRACT_RADIUS = 150, ATTRACT_FORCE = 2.5;
-  const TRAIL_RATE = 4;
+  const TRAIL_RATE = 3; // Bajado de 4 a 3 para suavizar rastro en pantallas táctiles
  
   let isDown = false;
-
-  // ★ Flag para bloquear interacción con partículas en mobile una vez revelado el texto
   let canvasInteractionEnabled = true;
  
   function makeTrailParticle(x: number, y: number): Particle {
     const angle = Math.random() * Math.PI * 2;
     const speed = rand(0.2, 1.2);
-    const hue   = Math.random() < 0.6 ? 270 : 190;
+    const hue = Math.random() < 0.6 ? 270 : 190;
     return {
       x: x + rand(-8, 8), y: y + rand(-8, 8),
       vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
-      size: rand(4, 9), alpha: rand(0.6, 1),
+      size: rand(3, 7), alpha: rand(0.6, 1),
       hue, sat: 100, lit: rand(60, 82),
       life: 0, maxLife: rand(25, 65), drag: 0.94,
     };
   }
 
+  // ─── 2. GESTIÓN DE EVENTOS DE INTERACCIÓN ────────────────────────────────
   function handleMove(clientX: number, clientY: number) {
-    if (!canvasInteractionEnabled) return; // ★
+    if (!canvasInteractionEnabled) return;
     const rect = canvas.getBoundingClientRect();
     const mx = clientX - rect.left;
     const my = clientY - rect.top;
@@ -225,13 +214,13 @@
     }
   }
 
-  function handlePress(clientX: number, clientY: number) {
-    if (!canvasInteractionEnabled) return; // ★
+  function handlePress() {
+    if (!canvasInteractionEnabled) return;
     isDown = true;
   }
 
   function handleRelease(clientX: number, clientY: number, triggerBurst = false) {
-    if (!canvasInteractionEnabled) return; // ★
+    if (!canvasInteractionEnabled) return;
     isDown = false;
     if (triggerBurst) {
       const rect = canvas.getBoundingClientRect();
@@ -251,29 +240,27 @@
   }
  
   // Listeners Mouse
-  canvas.addEventListener('mousedown', (e) => handlePress(e.clientX, e.clientY));
+  canvas.addEventListener('mousedown', () => handlePress());
   canvas.addEventListener('mouseup', (e) => handleRelease(e.clientX, e.clientY, true));
   canvas.addEventListener('mouseleave', () => handleRelease(0, 0, false));
   canvas.addEventListener('mousemove', (e) => handleMove(e.clientX, e.clientY));
 
-  // Listeners Touch
+  // Listeners Touch (Optimizados para respuesta inmediata)
   canvas.addEventListener('touchstart', (e) => {
-    const touch = e.touches[0];
-    handlePress(touch.clientX, touch.clientY);
+    if (e.touches.length > 0) handlePress();
   }, { passive: true });
 
   canvas.addEventListener('touchmove', (e) => {
-    const touch = e.touches[0];
-    handleMove(touch.clientX, touch.clientY);
+    if (e.touches.length > 0) handleMove(e.touches[0].clientX, e.touches[0].clientY);
   }, { passive: true });
 
   canvas.addEventListener('touchend', (e) => {
     if (e.changedTouches.length > 0) {
-      const touch = e.changedTouches[0];
-      handleRelease(touch.clientX, touch.clientY, true);
+      handleRelease(e.changedTouches[0].clientX, e.changedTouches[0].clientY, true);
     }
   }, { passive: true });
  
+  // Loop de Renderizado
   function drawFrame() {
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = 'rgba(8,8,16,0.2)';
@@ -319,12 +306,12 @@
   window.addEventListener('resize', () => { resize(); initParticles(); }, { passive: true });
   startCanvas();
  
-  // ─── ANIMACIÓN DE ENTRADA ──────────────────────────────────────────────────
+  // ─── 3. ANIMACIONES DE ENTRADA Y LÓGICA DE REVELADO (REPETIR TU FLUJO) ───
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isDesktop = window.innerWidth >= 768;
   
   if (prefersReduced) {
-    gsap.set(['#hero-text-container', '#hero-eyebrow','#hero-name','#hero-alias','#hero-tagline','#hero-tools','#hero-scroll'], { opacity: 1 });
+    gsap.set(['#hero-text-container', '#hero-eyebrow','#hero-name','#hero-alias','#hero-tagline','#hero-tools'], { opacity: 1 });
   } else if (isDesktop) {
     gsap.set('#hero-text-container', { opacity: 1 });
 
@@ -333,54 +320,35 @@
       .fromTo('#hero-name',     { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.9, ease: 'power3.out' }, '-=0.1')
       .fromTo('#hero-alias',    { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.5, ease: 'power2.out' }, '-=0.4')
       .fromTo('#hero-tagline',  { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.5, ease: 'power2.out' }, '-=0.2')
-      .fromTo('#hero-tools',    { opacity: 0 },          { opacity: 1, duration: 0.5, ease: 'power1.out' },       '-=0.1')
-      .fromTo('#hero-scroll',   { opacity: 0 },          { opacity: 1, duration: 0.4 },                           '-=0.1');
+      .fromTo('#hero-tools',    { opacity: 0 },          { opacity: 1, duration: 0.5, ease: 'power1.out' },       '-=0.1');
  
-    gsap.fromTo('#scrollLine',
-      { scaleX: 0, transformOrigin: 'left' },
-      { scaleX: 1, duration: 1, ease: 'power1.inOut', repeat: -1, yoyo: true, delay: 1.5 }
-    );
-
-} else {
-    // 1️⃣ CONFIGURACIÓN INICIAL EN MOBILE
+  } else {
+    // Configuración inicial Mobile estricta
     gsap.set('#hero-text-container', { opacity: 0, pointerEvents: 'none' });
     gsap.set(['#hero-eyebrow', '#hero-name', '#hero-alias', '#hero-tagline', '#hero-tools'], { opacity: 0 });
 
-    // Forzamos el bloqueo absoluto por CSS en el render inicial de mobile
     document.documentElement.classList.add('lock-scroll');
     document.body.classList.add('lock-scroll');
-
-    // Animación infinita para la línea de scroll
-    gsap.fromTo('#scrollLine',
-      { scaleX: 0, transformOrigin: 'left' },
-      { scaleX: 1, duration: 1, ease: 'power1.inOut', repeat: -1, yoyo: true }
-    );
 
     let heroRevealed = false;
     let textAnimationDone = false;
     let fingerIsDown = false;
     const scrollZone = document.getElementById('hero-scroll-zone')!;
 
-    // 2️⃣ FUNCIÓN DE REVELACIÓN DEL TEXTO
     function revealHeroMobile() {
       if (heroRevealed) return;
       heroRevealed = true;
 
-      // Apagamos la interacción del canvas para liberar los links del texto
+      // Apagamos interacción con partículas solo tras activarse el reveal
       canvasInteractionEnabled = false;
       canvas.style.pointerEvents = 'none';
 
-      // Mostramos el contenedor de texto
       gsap.set('#hero-text-container', { opacity: 1, pointerEvents: 'auto' });
       
       const tl = gsap.timeline({
         onComplete: () => {
           textAnimationDone = true;
-          // Si la animación termina pero el usuario sigue teniendo el dedo apoyado,
-          // esperamos a que lo levante para liberar la pantalla.
-          if (!fingerIsDown) {
-            liberarScrollNativo();
-          }
+          if (!fingerIsDown) liberarScrollNativo();
         }
       });
 
@@ -388,54 +356,35 @@
         .fromTo('#hero-name',     { opacity: 0, y: 25 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, '-=0.15')
         .fromTo('#hero-alias',    { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, '-=0.25')
         .fromTo('#hero-tagline',  { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, '-=0.2')
-        .fromTo('#hero-tools',    { opacity: 0 },         { opacity: 1, duration: 0.4, ease: 'power1.out' },       '-=0.15');
+        .fromTo('#hero-tools',    { opacity: 0 },          { opacity: 1, duration: 0.4, ease: 'power1.out' },       '-=0.15');
     }
 
     function liberarScrollNativo() {
-      // 🎯 Eliminamos las clases de CSS: la página recupera su altura total
-      // y el usuario ahora sí puede realizar un SEGUNDO scroll independiente para bajar.
-      document.documentElement.classList.remove('lock-scroll');
+      document.documentElement.remove('lock-scroll');
       document.body.classList.remove('lock-scroll');
     }
 
-    // 3️⃣ DETECCIÓN DE ESTADOS DEL DEDO (FILTRO DE INERCIA)
-    scrollZone.addEventListener('touchstart', () => {
-      fingerIsDown = true;
-    }, { passive: true });
-
-    scrollZone.addEventListener('touchmove', (e) => {
-      if (!heroRevealed) {
-        revealHeroMobile();
-      }
-    }, { passive: true });
+    // El reveal se ejecuta ÚNICAMENTE al interactuar en la scrollZone
+    scrollZone.addEventListener('touchstart', () => { fingerIsDown = true; }, { passive: true });
+    scrollZone.addEventListener('touchmove', () => { if (!heroRevealed) revealHeroMobile(); }, { passive: true });
 
     window.addEventListener('touchend', () => {
       fingerIsDown = false;
-      // Solo liberamos el freno de mano si la animación del texto ya terminó por completo
-      if (heroRevealed && textAnimationDone) {
-        liberarScrollNativo();
-      }
+      if (heroRevealed && textAnimationDone) liberarScrollNativo();
     });
 
-    // Mantener compatibilidad con un tap rápido en la franja
     scrollZone.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      
+      e.preventDefault(); e.stopPropagation();
       if (!heroRevealed) {
         revealHeroMobile();
       } else if (textAnimationDone) {
-        const nextSection = document.querySelector('section:not(#hero-section)');
-        if (nextSection) {
-          nextSection.scrollIntoView({ behavior: 'smooth' });
-        }
+        document.querySelector('section:not(#hero-section)')?.scrollIntoView({ behavior: 'smooth' });
       }
     });
-} // <--- ✅ AQUÍ CERRAMOS CORRECTAMENTE EL "ELSE" DE MOBILE
+  }
 
-// ─── SCROLLTRIGGER MATCHMEDIA ─────────────────────────────────────────────
-ScrollTrigger.matchMedia({
-    // ★ MOBILE: Controla el desvanecimiento total cuando ya se puede trackear el scroll hacia abajo
+  // ─── 4. SCROLLTRIGGER MATCHMEDIA ─────────────────────────────────────────
+  ScrollTrigger.matchMedia({
     "(max-width: 767px)": function() {
       ScrollTrigger.create({
         trigger: '#hero-section',
@@ -443,36 +392,35 @@ ScrollTrigger.matchMedia({
         end: '+=80%', 
         scrub: true,
         onUpdate(self) {
-          const opacity = 1 - self.progress;
-          gsap.set(['#hero-text-container', '#heroCanvas', '#hero-scroll'], { opacity });
+          gsap.set(['#hero-text-container', '#heroCanvas', '#hero-scroll-zone'], { opacity: 1 - self.progress });
         }
       });
-    },
-
-    // DESKTOP: Inmune
-    "(min-width: 768px)": function() {
-      gsap.set('#hero-text-container', { opacity: 1 });
-      gsap.set('#hero-scroll', { opacity: 1 });
     }
-}); // <--- ✅ AQUÍ SE CIERRA EL MATCHMEDIA
-
-// ── Links de tools hacia Works ───────────────────────────
-document.querySelectorAll<HTMLElement>('[data-works-tool]').forEach(el => {
-  el.addEventListener('click', () => {
-    const tool = el.dataset.worksTool!;
-    window.dispatchEvent(new CustomEvent('worksFilter', { detail: { tool } }));
   });
 
-  // Al final de tu script del hero, agregás esto:
-const canvas = document.getElementById('heroCanvas');
-const worksSection = document.getElementById('works-section');
+  // ─── 5. INTERSECTION OBSERVER (Usando la variable global 'canvas') ────────
+  const worksSection = document.getElementById('works-section');
+  if (worksSection) {
+    const observer = new IntersectionObserver(([entry]) => {
+      canvas.style.pointerEvents = entry.isIntersecting ? 'none' : 'auto';
+    }, { threshold: 0.1 });
+    observer.observe(worksSection);
+  }
 
-if (canvas && worksSection) {
-  const observer = new IntersectionObserver(([entry]) => {
-    canvas.style.pointerEvents = entry.isIntersecting ? 'none' : 'auto';
-  }, { threshold: 0.1 });
+  // ─── 6. FILTROS DE TRABAJOS ──────────────────────────────────────────────
+  document.querySelectorAll('[data-link-category]').forEach(el => {
+    el.addEventListener('click', () => {
+      window.dispatchEvent(new CustomEvent('worksFilter', {
+        detail: { tool: el.getAttribute('data-link-category') }
+      }));
+    });
+  });
 
-  observer.observe(worksSection);
-}
-
-});
+  document.querySelectorAll('[data-tag-tool]').forEach(el => {
+    el.addEventListener('click', () => {
+      window.dispatchEvent(new CustomEvent('worksFilter', {
+        detail: { tool: el.getAttribute('data-tag-tool') }
+      }));
+    });
+  });
+</script>
