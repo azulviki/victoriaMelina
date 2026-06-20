@@ -37,7 +37,7 @@
       </div>
 
       <!-- VIDEO LOOP -->
-      <div class="sobremi-media relative z-10 w-full md:w-1/2 flex md:justify-center reveal-up">
+      <div class="sobremi-media relative z-10 w-full md:w-1/2 flex md:justify-center">
         <div class="sobremi-video-frame">
           <video
             class="sobremi-video"
@@ -141,17 +141,11 @@
   const sobremiVideo = document.querySelector('#sobremi-section .sobremi-video') as HTMLVideoElement | null;
 
   if (sobremiVideo) {
-    const videoObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            sobremiVideo.play().catch(() => {});
-          }
-        });
-      },
-      { threshold: 0.25 }
-    );
-    videoObserver.observe(sobremiVideo);
+    const tryPlay = () => sobremiVideo.play().catch(() => {});
+    tryPlay();
+    sobremiVideo.addEventListener('loadeddata', tryPlay);
+    sobremiVideo.addEventListener('canplay', tryPlay);
+    document.addEventListener('touchstart', tryPlay, { once: true, passive: true });
   }
 
   // ─── PARTÍCULAS AMBIENTALES DE FONDO ─────────────────────────────────────
