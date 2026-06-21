@@ -5,11 +5,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght=700&family=Space+Mono&display=swap" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
-<section id="hero-section" class="hero relative min-h-dvh flex items-center overflow-hidden bg-[#080810]">
+<section id="hero-section" class="hero relative min-h-dvh flex items-center overflow-hidden">
 
-  
-  <canvas id="heroCanvas" class="absolute inset-0 w-full h-full z-10 cursor-crosshair touch-none pointer-events-auto"></canvas>
-  
   <!-- El contenedor de texto usa z-20 pero deja pasar los eventos al canvas donde no hay texto -->
   <div id="hero-text-container" class="absolute inset-0 z-20 px-6 md:px-16 lg:px-24 w-full flex items-center justify-start opacity-0 pointer-events-none select-none transition-opacity duration-700 ease-out">
 
@@ -110,212 +107,8 @@
   import { gsap } from 'gsap';
   import { ScrollTrigger } from 'gsap/ScrollTrigger';
   gsap.registerPlugin(ScrollTrigger);
- 
-  // ─── 1. DECLARACIÓN ÚNICA DEL CANVAS Y VARIABLES ─────────────────────────
-  const canvas = document.getElementById('heroCanvas') as HTMLCanvasElement;
-  const ctx = canvas.getContext('2d')!;
-  let W = 0, H = 0;
- 
-  interface Particle {
-    x: number; y: number;
-    vx: number; vy: number;
-    size: number; alpha: number;
-    hue: number; sat: number; lit: number;
-    life: number; maxLife: number;
-    drag?: number;
-  }
- 
-  let particles: Particle[] = [];
-  const rand = (a: number, b: number) => a + Math.random() * (b - a);
- 
-  function makeParticle(): Particle {
-    const angle = Math.random() * Math.PI * 2;
-    const speed = rand(0.08, 0.45);
-    const hue = Math.random() < 0.6 ? 270 : 190;
-    return {
-      x: Math.random() * W, y: Math.random() * H,
-      vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
-      size: rand(4, 10), // Ajuste sutil de tamaño máximo para rendimiento móvil
-      alpha: rand(0.25, 0.85),
-      hue, sat: rand(70, 100), lit: rand(50, 75),
-      life: 0, maxLife: rand(200, 700),
-    };
-  }
- 
-  function makeBurstParticle(x: number, y: number): Particle {
-    const angle = Math.random() * Math.PI * 2;
-    const speed = rand(1.5, 5);
-    const hue = Math.random() < 0.5 ? 270 : 190;
-    return {
-      x, y,
-      vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
-      size: rand(5, 12),
-      alpha: rand(0.7, 1),
-      hue, sat: 100, lit: rand(65, 85),
-      life: 0, maxLife: rand(40, 90), drag: 0.92,
-    };
-  }
- 
-  function resize() { 
-    W = canvas.width = window.innerWidth; 
-    H = canvas.height = window.innerHeight; 
-  }
-  
-  function initParticles() {
-    // Reducimos la densidad de partículas SOLO en mobile para evitar lag de procesamiento
-    const isMobile = window.innerWidth < 768;
-    const divisor = isMobile ? 9500 : 6000;
-    const maxCount = isMobile ? 85 : 180;
-    const count = Math.min(Math.floor((W * H) / divisor), maxCount);
-    particles = Array.from({ length: count }, makeParticle);
-  }
- 
-  const REPEL_RADIUS = 140, REPEL_FORCE = 8, BURST_COUNT = 15; // Bajado de 18 a 15 para mobile
-  const HOVER_RADIUS = 80,  HOVER_FORCE = 0.4;
-  const ATTRACT_RADIUS = 150, ATTRACT_FORCE = 2.5;
-  const TRAIL_RATE = 3; // Bajado de 4 a 3 para suavizar rastro en pantallas táctiles
- 
-  let isDown = false;
-  let canvasInteractionEnabled = true;
- 
-  function makeTrailParticle(x: number, y: number): Particle {
-    const angle = Math.random() * Math.PI * 2;
-    const speed = rand(0.2, 1.2);
-    const hue = Math.random() < 0.6 ? 270 : 190;
-    return {
-      x: x + rand(-8, 8), y: y + rand(-8, 8),
-      vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
-      size: rand(3, 7), alpha: rand(0.6, 1),
-      hue, sat: 100, lit: rand(60, 82),
-      life: 0, maxLife: rand(25, 65), drag: 0.94,
-    };
-  }
 
-  // ─── 2. GESTIÓN DE EVENTOS DE INTERACCIÓN ────────────────────────────────
-  function handleMove(clientX: number, clientY: number) {
-    if (!canvasInteractionEnabled) return;
-    const rect = canvas.getBoundingClientRect();
-    const mx = clientX - rect.left;
-    const my = clientY - rect.top;
- 
-    if (isDown) {
-      particles.forEach(p => {
-        const dx = mx - p.x, dy = my - p.y;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        if (dist < ATTRACT_RADIUS && dist > 0) {
-          const force = (1 - dist / ATTRACT_RADIUS) * ATTRACT_FORCE;
-          p.vx += (dx/dist) * force;
-          p.vy += (dy/dist) * force;
-        }
-      });
-      for (let i = 0; i < TRAIL_RATE; i++) {
-        particles.push(makeTrailParticle(mx, my));
-      }
-    } else {
-      particles.forEach(p => {
-        const dx = p.x - mx, dy = p.y - my;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        if (dist < HOVER_RADIUS && dist > 0) {
-          const force = (1 - dist / HOVER_RADIUS) * HOVER_FORCE;
-          p.vx += (dx/dist)*force; p.vy += (dy/dist)*force;
-        }
-      });
-    }
-  }
-
-  function handlePress() {
-    if (!canvasInteractionEnabled) return;
-    isDown = true;
-  }
-
-  function handleRelease(clientX: number, clientY: number, triggerBurst = false) {
-    if (!canvasInteractionEnabled) return;
-    isDown = false;
-    if (triggerBurst) {
-      const rect = canvas.getBoundingClientRect();
-      const mx = clientX - rect.left;
-      const my = clientY - rect.top;
-      particles.forEach(p => {
-        const dx = p.x - mx, dy = p.y - my;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        if (dist < REPEL_RADIUS && dist > 0) {
-          const force = (1 - dist / REPEL_RADIUS) * REPEL_FORCE;
-          p.vx += (dx/dist)*force; p.vy += (dy/dist)*force;
-          p.life = 0; p.maxLife = rand(200, 500);
-        }
-      });
-      particles.push(...Array.from({ length: BURST_COUNT }, () => makeBurstParticle(mx, my)));
-    }
-  }
- 
-  // Listeners Mouse
-  canvas.addEventListener('mousedown', () => handlePress());
-  canvas.addEventListener('mouseup', (e) => handleRelease(e.clientX, e.clientY, true));
-  canvas.addEventListener('mouseleave', () => handleRelease(0, 0, false));
-  canvas.addEventListener('mousemove', (e) => handleMove(e.clientX, e.clientY));
-
-  // Listeners Touch (Optimizados para respuesta inmediata)
-  canvas.addEventListener('touchstart', (e) => {
-    if (e.touches.length > 0) handlePress();
-  }, { passive: true });
-
-  canvas.addEventListener('touchmove', (e) => {
-    if (e.touches.length > 0) handleMove(e.touches[0].clientX, e.touches[0].clientY);
-  }, { passive: true });
-
-  canvas.addEventListener('touchend', (e) => {
-    if (e.changedTouches.length > 0) {
-      handleRelease(e.changedTouches[0].clientX, e.changedTouches[0].clientY, true);
-    }
-  }, { passive: true });
- 
-  // Loop de Renderizado
-  function drawFrame() {
-    ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = 'rgba(8,8,16,0.2)';
-    ctx.fillRect(0, 0, W, H);
- 
-    for (let i = particles.length - 1; i >= 0; i--) {
-      const p = particles[i];
-      p.life++;
-      if (p.drag !== undefined) { p.vx *= p.drag; p.vy *= p.drag; }
-      p.x += p.vx; p.y += p.vy;
-      const progress = p.life / p.maxLife;
-      const fade = progress < 0.1 ? progress/0.1 : progress > 0.8 ? (1-progress)/0.2 : 1;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fillStyle = `hsla(${p.hue},${p.sat}%,${p.lit}%,${p.alpha * fade})`;
-      ctx.fill();
-      if (p.life >= p.maxLife) {
-        if (p.drag !== undefined) particles.splice(i, 1);
-        else particles[i] = makeParticle();
-      } else if (p.drag === undefined && (p.x < -10 || p.x > W+10 || p.y < -10 || p.y > H+10)) {
-        particles[i] = makeParticle();
-      }
-    }
- 
-    const ambient = particles.filter(p => p.drag === undefined);
-    for (let i = 0; i < ambient.length; i++) {
-      for (let j = i + 1; j < ambient.length; j++) {
-        const dx = ambient[i].x - ambient[j].x, dy = ambient[i].y - ambient[j].y;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        if (dist < 100) {
-          ctx.beginPath();
-          ctx.moveTo(ambient[i].x, ambient[i].y);
-          ctx.lineTo(ambient[j].x, ambient[j].y);
-          ctx.strokeStyle = `rgba(123,47,255,${0.08*(1-dist/100)})`;
-          ctx.lineWidth = 0.6; ctx.stroke();
-        }
-      }
-    }
-    requestAnimationFrame(drawFrame);
-  }
- 
-  function startCanvas() { resize(); initParticles(); drawFrame(); }
-  window.addEventListener('resize', () => { resize(); initParticles(); }, { passive: true });
-  startCanvas();
- 
-  // ─── 3. ANIMACIONES DE ENTRADA Y LÓGICA DE REVELADO (REPETIR TU FLUJO) ───
+  // ─── ANIMACIONES DE ENTRADA Y LÓGICA DE REVELADO ─────────────────────────
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isDesktop = window.innerWidth >= 768;
   
@@ -352,12 +145,6 @@
     function revealHeroMobile() {
       if (heroRevealed) return;
       heroRevealed = true;
-
-      // 🎯 CLAVE: apagamos la interacción de partículas EN EL MOMENTO DEL TOQUE,
-      // no al terminar la animación. Esto es lo que pediste: tocar la scroll-zone
-      // mata la reacción de las partículas de inmediato.
-      canvasInteractionEnabled = false;
-      canvas.style.pointerEvents = 'none';
 
       // Mostramos el contenedor de texto (todavía sin pointer-events,
       // se lo damos recién cuando termine la animación)
@@ -417,7 +204,7 @@
     });
   } // <--- cierra el else de mobile
 
-  // ─── SCROLLTRIGGER MATCHMEDIA (solo para el fade de salida en mobile) ────
+  // ─── SCROLLTRIGGER MATCHMEDIA (solo para el fade de salida del TEXTO en mobile) ────
   ScrollTrigger.matchMedia({
     "(max-width: 767px)": function() {
       ScrollTrigger.create({
@@ -431,19 +218,14 @@
           // El texto se va desvaneciendo a medida que el usuario sigue scrolleando
           gsap.set('#hero-text-container', { opacity: 1 - clampedProgress });
 
-          // Las partículas bajan suavemente de opacidad
-          const canvasOpacity = 1 - (clampedProgress * 0.75);
-          gsap.set('#heroCanvas', { opacity: canvasOpacity });
-
-          // Nota: ya NO reactivamos canvasInteractionEnabled acá.
-          // Una vez revelado el hero, las partículas quedan desactivadas
-          // para siempre en esta sesión de scroll, como pediste.
+          // Nota: el fade de las partículas ahora lo maneja el canvas global
+          // en Base.astro, no este componente.
         }
       });
     }
   });
 
-  // ─── 6. FILTROS DE TRABAJOS ──────────────────────────────────────────────
+  // ─── FILTROS DE TRABAJOS ──────────────────────────────────────────────
   document.querySelectorAll('[data-link-category]').forEach(el => {
     el.addEventListener('click', () => {
       window.dispatchEvent(new CustomEvent('worksFilter', {
@@ -452,7 +234,7 @@
     });
   });
 
-document.querySelectorAll('[data-tag-tool]').forEach(el => {
+  document.querySelectorAll('[data-tag-tool]').forEach(el => {
     el.addEventListener('click', () => {
       window.dispatchEvent(new CustomEvent('worksFilter', {
         detail: { tool: el.getAttribute('data-tag-tool') }

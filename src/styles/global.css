@@ -17,7 +17,7 @@
     --color-brand-dark: #c4b5fd;  /* El violeta oscuro base de tu nombre */
     --color-brand-light: #00c8ff; /* El lavanda del hover */
     --color-snow: #4e4e5f;    /* El blanco nieve para textos */
-    --color-bg: #080810;      /* El fondo oscuro */
+    --color-bg: #000000;      /* El fondo oscuro */
   }
 
   html {

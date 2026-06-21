@@ -4,7 +4,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        bg:        '#080810',
+        bg:        '#000000',
         'bg-card': '#0e0e1a',
         'bg-input':'#12121f',
         violet:    '#7b2fff',
