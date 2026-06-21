@@ -9,7 +9,8 @@
       <article class="work-slide" data-tool="touchdesigner,ableton" data-category="motion,sound" data-index="0">
         <div class="slide-content flex flex-col items-center justify-start w-full h-full px-6 md:px-12 pt-8 box-border"> 
           <div class="slide-video">
-            <iframe src="https://www.youtube.com/embed/9Lqg5VdWMFc?autoplay=0&mute=0&loop=1&playlist=9Lqg5VdWMFc&controls=1"
+           
+            <iframe src="https://www.youtube.com/embed/9Lqg5VdWMFc?autoplay=0&mute=0&loop=1&playlist=9Lqg5VdWMFc&controls=1&enablejsapi=1">
                     frameborder="0" allow="autoplay; fullscreen" allowfullscreen loading="lazy"></iframe>
           </div>
           <div class="slide-info">
@@ -19,6 +20,22 @@
           </div>
         </div>
       </article>
+
+      <article class="work-slide" data-tool="touchdesigner,ableton" data-category="motion" data-index="0">
+        <div class="slide-content flex flex-col items-center justify-start w-full h-full px-6 md:px-12 pt-8 box-border"> 
+          <div class="slide-video">
+            <iframe src="https://www.youtube.com/embed/U5XtiDK3hv4?autoplay=0&mute=0&loop=1&playlist=U5XtiDK3hv4&controls=1"
+                    frameborder="0" allow="autoplay; fullscreen" allowfullscreen loading="lazy"></iframe>
+          </div>
+          <div class="slide-info">
+            <p class="slide-tool">Touchdesigner</p>
+            <h2 class="slide-title">Rosa</h2>
+            <p class="slide-desc">Hecho en Touchdesigner con audioreactividad.</p>
+          </div>
+        </div>
+      </article>
+
+
 
       <article class="work-slide" data-tool="touchdesigner" data-index="1">
         <div class="slide-content flex flex-col items-center justify-start w-full h-full px-6 md:px-12 pt-8 box-border">
@@ -231,10 +248,23 @@
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: 1.5rem;
   width: 100%;
-  max-width: 1600px;   /* ajustá este número al ancho que te gusta en local */
-  margin: 0 auto;      /* esto es lo que centra el contenedor */
-  overflow: hidden;
+  max-width: 1600px;
+  margin: 0 auto;
+
+  /* ANTES: overflow: hidden; */
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  scroll-snap-type: x mandatory !important;
+  -webkit-overflow-scrolling: touch;
   position: relative;
+}
+#works-track {
+  display: flex !important;
+  width: max-content !important;
+}
+
+#works-track-wrapper::-webkit-scrollbar {
+  display: none !important;
 }
 
   #works-track-wrapper::-webkit-scrollbar {
@@ -242,17 +272,15 @@
   }
 
   .work-slide {
-    scroll-snap-align: start !important;
-    scroll-snap-stop: always !important;
-    width: 100vw !important;
-    height: 100% !important;
-    /* CLAVE: Ponemos el padding de arriba en 0 para que el video toque el techo */
-    padding: 0rem !important; 
-    /* El slide reparte su alto real entre video + texto, en vez de que
-       cada uno calcule un % de la pantalla por su cuenta */
-    display: flex !important;
-    flex-direction: column !important;
-  }
+  scroll-snap-align: start !important;
+  scroll-snap-stop: always !important;
+  width: 100vw !important;
+  flex: 0 0 100vw !important;   /* ← esta línea es la que falta */
+  height: 100% !important;
+  padding: 0rem !important; 
+  display: flex !important;
+  flex-direction: column !important;
+}
 
   /* El video ahora nace desde el pixel 0 de arriba y ocupa su espacio cinematográfico */
   .slide-video {
@@ -424,88 +452,124 @@
 
 <script>
   import { gsap } from 'gsap';
-
+ 
   let currentFilter = 'all';
   let currentIndex  = 0;
-
+ 
   const track      = document.getElementById('works-track')!;
   const dotsEl     = document.getElementById('works-dots')!;
-  const counterCur = document.getElementById('works-current')!;
-  const counterTot = document.getElementById('works-total')!;
   const prevBtn    = document.getElementById('works-prev') as HTMLButtonElement;
   const nextBtn    = document.getElementById('works-next') as HTMLButtonElement;
   const filterBtns = document.querySelectorAll<HTMLButtonElement>('.works-filter');
   const allSlides  = Array.from(document.querySelectorAll<HTMLElement>('.work-slide'));
-
+ 
+  // ── Control de reproducción de video (YouTube + Vimeo) ──────────────
+  function pauseAllVideos() {
+    document.querySelectorAll<HTMLIFrameElement>('.slide-video iframe').forEach(iframe => {
+      const src = iframe.src || '';
+      if (!iframe.contentWindow) return;
+ 
+      if (src.includes('youtube.com')) {
+        iframe.contentWindow.postMessage(
+          JSON.stringify({ event: 'command', func: 'pauseVideo', args: [] }),
+          '*'
+        );
+      } else if (src.includes('vimeo.com')) {
+        iframe.contentWindow.postMessage(
+          JSON.stringify({ method: 'pause' }),
+          '*'
+        );
+      }
+    });
+  }
+ 
+  function playVideoIn(slide: HTMLElement) {
+    const iframe = slide.querySelector<HTMLIFrameElement>('.slide-video iframe');
+    if (!iframe || !iframe.contentWindow) return;
+    const src = iframe.src || '';
+ 
+    if (src.includes('youtube.com')) {
+      iframe.contentWindow.postMessage(
+        JSON.stringify({ event: 'command', func: 'playVideo', args: [] }),
+        '*'
+      );
+    } else if (src.includes('vimeo.com')) {
+      iframe.contentWindow.postMessage(
+        JSON.stringify({ method: 'play' }),
+        '*'
+      );
+    }
+  }
+  // ──────────────────────────────────────────────────────────────────
+ 
   function visibleSlides(): HTMLElement[] {
-  return allSlides.filter(s => {
-    if (currentFilter === 'all') return true;
-    const tools = s.dataset.tool?.split(',') ?? [];
-    const cats  = s.dataset.category?.split(',') ?? [];
-    return tools.includes(currentFilter) || cats.includes(currentFilter);
-  });
-}
-
+    return allSlides.filter(s => {
+      if (currentFilter === 'all') return true;
+      const tools = s.dataset.tool?.split(',') ?? [];
+      const cats  = s.dataset.category?.split(',') ?? [];
+      return tools.includes(currentFilter) || cats.includes(currentFilter);
+    });
+  }
+ 
   function applyFilter(filter: string) {
+    pauseAllVideos(); // frenamos todo antes de reorganizar slides
+ 
     currentFilter = filter;
     currentIndex  = 0;
     allSlides.forEach(s => {
-  const tools = s.dataset.tool?.split(',') ?? [];
-  const cats  = s.dataset.category?.split(',') ?? [];
-  const match = filter === 'all' || tools.includes(filter) || cats.includes(filter);
-  s.dataset.hidden = match ? 'false' : 'true';
-});
-
+      const tools = s.dataset.tool?.split(',') ?? [];
+      const cats  = s.dataset.category?.split(',') ?? [];
+      const match = filter === 'all' || tools.includes(filter) || cats.includes(filter);
+      s.dataset.hidden = match ? 'false' : 'true';
+    });
+ 
     buildDots();
     goTo(0, false);
     filterBtns.forEach(btn =>
       btn.classList.toggle('active', btn.dataset.filter === currentFilter)
     );
   }
-
+ 
   function buildDots() {
-  const dotsContainer = document.getElementById('tu-contenedor-de-dots'); // El selector que uses
-  
-  // 🎯 SALVAGUARDA: Si no existe el contenedor en la página actual, salí de la función antes de romper todo
-  if (!dotsContainer) return; 
-
-  // Tu lógica actual...
-  // Ejemplo: dotsContainer.textContent = ""; 
-}
-
+    const dotsContainer = document.getElementById('tu-contenedor-de-dots');
+    if (!dotsContainer) return;
+  }
+ 
   function updateDots() {
     dotsEl.querySelectorAll('.works-dot').forEach((d, i) =>
       d.classList.toggle('active', i === currentIndex)
     );
   }
-
-function goTo(index: number, animate = true) {
+ 
+  function goTo(index: number, animate = true) {
+    pauseAllVideos(); // SIEMPRE frenamos antes de cambiar de slide, mobile o desktop
+ 
     // SI ES CELULAR, DETENEMOS A GSAP (Dejamos que actúe el scroll nativo del CSS)
     if (window.innerWidth < 768) {
       currentIndex = index;
-      updateDots(); // Mantiene vivos los puntitos indicadores de abajo si los usas
+      updateDots();
       return;
     }
-
+ 
     const slides = visibleSlides();
     if (!slides.length) return;
     currentIndex = Math.max(0, Math.min(index, slides.length - 1));
-
+ 
     const wrapper = document.getElementById('works-track-wrapper')!;
     const offset = currentIndex * wrapper.offsetWidth;
-
+ 
     animate
       ? gsap.to(track, { x: -offset, duration: 0.7, ease: 'power3.inOut' })
       : gsap.set(track, { x: -offset });
-
+ 
     updateDots();
     prevBtn.disabled = currentIndex === 0;
     nextBtn.disabled = currentIndex === slides.length - 1;
   }
-
+ 
   prevBtn.addEventListener('click', () => goTo(currentIndex - 1));
   nextBtn.addEventListener('click', () => goTo(currentIndex + 1));
-
+ 
   // Swipe touch
   let touchStartX = 0;
   const wrapper = document.getElementById('works-track-wrapper')!;
@@ -514,20 +578,35 @@ function goTo(index: number, animate = true) {
     const diff = touchStartX - e.changedTouches[0].clientX;
     if (Math.abs(diff) > 40) diff > 0 ? goTo(currentIndex + 1) : goTo(currentIndex - 1);
   }, { passive: true });
-
+ 
+  // En mobile el scroll es nativo (CSS scroll-snap), así que también
+  // escuchamos el scroll del wrapper para frenar el video cuando el
+  // usuario desliza con el dedo sin pasar por goTo().
+  let scrollTimeout: ReturnType<typeof setTimeout>;
+  wrapper.addEventListener('scroll', () => {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      pauseAllVideos();
+    }, 100);
+  }, { passive: true });
+ 
   // Filtros internos
   filterBtns.forEach(btn =>
     btn.addEventListener('click', () => applyFilter(btn.dataset.filter ?? 'all'))
   );
-
+ 
   // ── Evento desde el Hero ──────────────────────────────────
-  // El hero dispara: window.dispatchEvent(new CustomEvent('worksFilter', { detail: { tool: 'resolume' } }))
   window.addEventListener('worksFilter', (e: Event) => {
     const { tool } = (e as CustomEvent<{ tool: string }>).detail;
     const section = document.getElementById('works-section');
     if (section) section.scrollIntoView({ behavior: 'smooth' });
     setTimeout(() => applyFilter(tool), 400);
   });
-
+ 
+  // Pausamos todos los videos si el usuario sale de la pestaña/ventana
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) pauseAllVideos();
+  });
+ 
   applyFilter('all');
 </script>
