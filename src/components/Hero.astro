@@ -258,10 +258,11 @@
     });
   });
 
-  // ─── LINK DE NAVEGACIÓN: CONTACTO (abre el modal, no scrollea) ─────────
+  // ─── LINK DE NAVEGACIÓN: CONTACTO (Antes abría el modal, AHORA hace scroll suave) ───
   document.querySelectorAll('[data-open-contact-modal]').forEach(el => {
     el.addEventListener('click', () => {
-      window.dispatchEvent(new CustomEvent('openContactModal'));
+      const target = document.getElementById('contacto-section');
+      target?.scrollIntoView({ behavior: 'smooth' });
     });
   });
 
