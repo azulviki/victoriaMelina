@@ -28,20 +28,18 @@ import ScrollToTopArrow from './ScrollToTopArrow.astro';
         La vía la elegís vos.
       </p>
 
-      <div class="contacto-links flex flex-col gap-4 w-full pointer-events-auto relative z-50">
+      <div class="contacto-links flex items-center justify-center gap-8 w-full pointer-events-auto relative z-50">
         
         <a 
           href="https://wa.me/+541156231164" 
           target="_blank" 
           rel="noopener noreferrer" 
           class="contacto-link-btn"
+          aria-label="WhatsApp"
         >
-          <div class="flex items-center gap-4">
-            <svg class="link-icon w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-            </svg>
-          </div>
-          <span class="link-arrow">→</span>
+          <svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+          </svg>
         </a>
 
         <!-- Email (Link Web a Gmail — Evita los bloqueos de protocolos del sistema operativo) -->
@@ -50,14 +48,12 @@ import ScrollToTopArrow from './ScrollToTopArrow.astro';
           target="_blank" 
           rel="noopener noreferrer" 
           class="contacto-link-btn"
+          aria-label="Email"
         >
-          <div class="flex items-center gap-4">
-            <svg class="link-icon w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-              <polyline points="22,6 12,13 2,6"/>
-            </svg>
-          </div>
-          <span class="link-arrow">→</span>
+          <svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
         </a>
 
         <a 
@@ -65,15 +61,13 @@ import ScrollToTopArrow from './ScrollToTopArrow.astro';
           target="_blank" 
           rel="noopener noreferrer" 
           class="contacto-link-btn"
+          aria-label="Instagram"
         >
-          <div class="flex items-center gap-4">
-            <svg class="link-icon w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
-            </svg>
-          </div>
-          <span class="link-arrow">→</span>
+          <svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+          </svg>
         </a>
 
       </div>
@@ -105,44 +99,47 @@ import ScrollToTopArrow from './ScrollToTopArrow.astro';
     }
   }
 
-  /* Botones de Links Estilizados */
+  /* Botones de íconos: circulares, sin texto ni flecha */
   .contacto-link-btn {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    width: 100%;
-    padding: 1.2rem 1.5rem;
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 0.75rem;
+    border-radius: 50%;
     color: #f0f0f8;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.95rem;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
     text-decoration: none;
     transition: border-color 0.25s ease, background 0.25s ease, transform 0.2s ease;
     box-sizing: border-box;
+    outline: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
   }
 
   .contacto-link-btn:hover {
     border-color: var(--violet, #7b2fff);
     background: rgba(255, 255, 255, 0.06);
-    transform: translateX(4px);
+    transform: translateY(-3px);
   }
 
   .contacto-link-btn:active {
-    transform: translateX(2px) scale(0.99);
+    transform: translateY(-1px) scale(0.97);
   }
 
-  .link-arrow {
+  .link-icon {
+    width: 28px;
+    height: 28px;
+    opacity: 0.85;
+    transition: transform 0.25s ease, color 0.25s ease;
+  }
+
+  .contacto-link-btn:hover .link-icon {
     color: var(--violet, #7b2fff);
-    font-weight: bold;
-    transition: transform 0.25s ease;
-  }
-
-  .contacto-link-btn:hover .link-arrow {
-    transform: translateX(4px);
+    opacity: 1;
   }
 
   /* Reveal-up al hacer scroll (mismo comportamiento que el resto de tu web) */
@@ -155,31 +152,6 @@ import ScrollToTopArrow from './ScrollToTopArrow.astro';
   .reveal-up.visible {
     opacity: 1;
     transform: translateY(0);
-  }
-
-  .link-icon {
-    opacity: 0.8;
-    transition: transform 0.25s ease, color 0.25s ease;
-  }
-
-  .contacto-link-btn {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    padding: 1.2rem 1.5rem;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 0.75rem;
-    color: #f0f0f8;
-    transition: border-color 0.25s ease, background 0.25s ease, transform 0.2s ease;
-    box-sizing: border-box;
-    
-    /* Agrega estas líneas para resetear el comportamiento si es un botón */
-    outline: none;
-    cursor: pointer;
-    -webkit-appearance: none;
-    appearance: none;
   }
 
   @media (prefers-reduced-motion: reduce) {
